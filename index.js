@@ -26,17 +26,23 @@ connection.connect((err)=>{
 
 
 // create the contact..
-app.post('/create',(req,res)=>{
-    const{First_Name,Last_Name,Email,Number} = req.body;
-    const sql = 'INSERT INTO contact (First_Name, Last_Name, Email, Number) VALUES (?, ?, ?)';
-    connection.query(sql, [First_Name,Last_Name, Email, Number], (error, results) => {
+app.post('/create', (req, res) => {
+    const { First_Name, Last_Name, Email, Number } = req.body;
+    
+    // Note that the SQL statement now matches the number of placeholders to the number of values
+    const sql = 'INSERT INTO contacts (First_Name, Last_Name, Email, Number) VALUES (?, ?, ?, ?)';
+    
+    connection.query(sql, [First_Name, Last_Name, Email, Number], (error, results) => {
         if (error) return res.status(500).json({ error: error.message });
-        res.status(201).json({ id: results.insertId, First_Name,Last_Name, Email, Number });
-      });
+        
+        
+        res.status(201).json({ id: results.insertId, First_Name, Last_Name, Email, Number });
+    });
 });
 
+
 app.get('/contacts', (req, res) => {
-    const sql = 'SELECT * FROM contact';
+    const sql = 'SELECT * FROM contacts';
     connection.query(sql, (error, results) => {
       if (error) return res.status(500).json({ error: error.message });
       res.status(200).json(results);
@@ -46,20 +52,20 @@ app.get('/contacts', (req, res) => {
   app.put('/contacts/:id', (req, res) => {
     const { id } = req.params;
     const { First_Name,Last_Name,Email,Number } = req.body;
-    const sql = 'UPDATE contact SET name = ?, email = ?, phone = ? WHERE id = ?';
+    const sql = 'UPDATE contacts SET First_Name = ?, Last_Name= ?, Email = ?, Number = ? WHERE id = ?';
     connection.query(sql, [First_Name,Last_Name,Email,Number, id], (error, results) => {
       if (error) return res.status(500).json({ error: error.message });
-      if (results.affectedRows === 0) return res.status(404).json({ message: 'Contact not found' });
+      if (results.affectedRows === 0) return res.status(404).json({ message: 'Contacts not found' });
       res.status(200).json({ id, First_Name,Last_Name,Email,Number });
     });
   });
 
   app.delete('/contacts/:id', (req, res) => {
     const { id } = req.params;
-    const sql = 'DELETE FROM contact WHERE id = ?';
+    const sql = 'DELETE FROM contacts WHERE id = ?';
     connection.query(sql, [id], (error, results) => {
       if (error) return res.status(500).json({ error: error.message });
-      if (results.affectedRows === 0) return res.status(404).json({ message: 'Contact not found' });
-      res.status(204).send();
+      if (results.affectedRows === 0) return res.status(404).json({ message: 'Contacts not found' });
+      res.status(204).json({message:"Delete"});
     });
   });
